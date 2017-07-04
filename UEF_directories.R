@@ -10,7 +10,7 @@ source("setup.R")
 # don't need this, files are in same directory
 
 # get a list of all the csv files in the directory
-csv_files <- list.files( pattern = ".+.csv", 
+csv_files <- list.files( pattern = "AHRI.+.csv", 
                         full.names = TRUE, 
                         ignore.case = TRUE)
 str(csv_files)
@@ -19,81 +19,23 @@ str(csv_files)
 csv_files[1]
 read_csv(csv_files[1])
 
+# try it as a list
+csv_tables <- lapply(csv_files, read_csv)
+DT_AHRI <- data.table::rbindlist(csv_tables)
 
+str(DT_AHRI)
+# Classes ‘data.table’ and 'data.frame':	758 obs. of  17 variables:
 
+# check for duplicates
+length(unique(DT_AHRI$AHRIReferenceNumber))
+# [1] 627
 
-read_excel("12_CPVCIN_2G_T1.XLS")
-read_xls("12_CPVCIN_2G_T1.XLS")
-# doesn't think it's an excel file.
-# opening in localc and saving as xls or xlsx 
-# then it can read them.
-read_excel("12_CPVCIN_2G_T1.2.xls")
-read_excel("12_CPVCIN_2G_T1.2.xlsx")
-
-# try gdata
-install.packages("gdata")
-library(gdata)
-read.xls("12_CPVCIN_2G_T1.XLS", verbose = TRUE)
-# uses perl. perl choked on it.
-
-# try XLConnect
-# needs rJava
-install.packages("rJava")
-library(rJava)
-
-# configure: error: Cannot compile a simple JNI program. See config.log for details.
-# 
-# Make sure you have Java Development Kit installed and correctly registered in R.
-# If in doubt, re-run "R CMD javareconf" as root.
-
-# sudo R CMD javareconf
-# conftest.c:1:17: fatal error: jni.h: No such file or directory
-# compilation terminated.
- 
-# use Synaptic to install r-cran-rjava
-library(rJava)
-
-install.packages("XLConnect")
-# * installing *source* package ‘XLConnectJars’ ...
-
-# ** testing if installed package can be loaded
-# Segmentation fault (core dumped)
-# ERROR: loading failed
-
-# try xlsReadWrite
-install.packages("xlsReadWrite")
-# Warning in install.packages :
-#   package ‘xlsReadWrite’ is not available (for R version 3.4.0)
-
-# try gnumeric
-install.packages("gnumeric")
-library(gnumeric)
-read.gnumeric.sheet("12_CPVCIN_2G_T1.XLS",head = TRUE, quiet = FALSE)
-  # LANG=C /usr/bin/ssconvert --export-type=Gnumeric_stf:stf_assistant  -O "locale=C format=automatic separator=, eol=unix sheet='Sheet1'" "12_CPVCIN_2G_T1.XLS" fd://1  
-  # Unknown BIFF type in BOF 9
-  # Unknown BOF (6)
-  # Loading file:///home/jiml/HotWaterResearch/projects/Pipe%20Test%20Data/pipe_data_scripts/12_CPVCIN_2G_T1.XLS failed
-  # Error in read.table(file = file, header = header, sep = sep, quote = quote,  : 
-  #                       no lines available in input
-
-# from https://msdn.microsoft.com/en-us/library/dd906793(v=office.12).aspx
-# the first 2 bytes must bee
-# An unsigned integer that specifies the BIFF version of the file. The value MUST be 0x0600. 
-# used wxHexEditor to look at it. 1st 2 bytes were 09 00
-# test changing 1st 2 bytes to 06 00
-read.gnumeric.sheet("12_CPVCIN_2G_T1.3.XLS",head = TRUE, quiet = FALSE)
-  # E Unsupported file format.
-  # Error in read.table(file = file, header = header, sep = sep, quote = quote,  : 
-  #   no lines available in input
-# that didn't work
-
-# tried ssconvert from gnumeric with various importers but couldn't get it to work
-# see if localc has command line macros, since it can open the files.
-
-# see soffice --help 
-# looks like 
-#   soffice --headless --convert-to csv 12_CPVCIN_2G_T1.XLS 
-# does the trick!
+# see the duplicates
+duplicated(DT_AHRI) | duplicated(DT_AHRI, fromLast = TRUE) 
+# duplicated doesn't flag 1st, this combines a forward and reverse look for duplicates
+data.table::setkey(DT_AHRI,AHRIReferenceNumber)
+DT_AHRI[duplicated(DT_AHRI) | duplicated(DT_AHRI, fromLast = TRUE),]
+# 213 
 
 
 #======
