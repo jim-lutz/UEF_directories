@@ -40,6 +40,12 @@ sessionInfo()
 if(!require(tidyverse)){install.packages("tidyverse")}
 library(tidyverse)
 
+# work with readxl
+# tidyverse doesn't seem to install it
+if(!require(readxl)){install.packages("readxl")}
+library(readxl)
+
+
 # work with data.tables
 #https://github.com/Rdatatable/data.table/wiki
 #https://www.datacamp.com/courses/data-analysis-the-data-table-way
