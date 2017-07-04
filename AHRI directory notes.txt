@@ -1,0 +1,9 @@
+2017-07-03
+
+The Excel files downloaded from AHRI don't read into LibreOffice Calc or even Gnumeric
+Change the first line from:
+<?xml version="1.0" encoding="utf-16"?>
+to:
+<?xml version="1.0" encoding="utf-8" ?>
+in wxHexEditor
+seemed to solve the problem.
