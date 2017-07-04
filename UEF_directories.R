@@ -9,16 +9,18 @@ source("setup.R")
 # source("setup_wd.R")
 # don't need this, files are in same directory
 
-# get a list of all the xls files in the wd_data subdirectories
-xls_files <- list.files( pattern = ".+.xls", 
+# get a list of all the csv files in the directory
+csv_files <- list.files( pattern = ".+.csv", 
                         full.names = TRUE, 
                         ignore.case = TRUE)
-str(xls_files)
+str(csv_files)
 
-# try reading 1st xls file
-xls_files[1]
-install.packages("readxl")
-library(readxl)
+# try reading 1st csv file
+csv_files[1]
+read_csv(csv_files[1])
+
+
+
 
 read_excel("12_CPVCIN_2G_T1.XLS")
 read_xls("12_CPVCIN_2G_T1.XLS")
